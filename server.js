@@ -8,22 +8,33 @@ const port = 3000;
 
 secretKey = "akjfhasdkjlfhkjsdf";
 
+
+
 app.use(express.json());
 app.use(cookieParser());
+app.use(express.static(__dirname + '/public'));
 
 app.get('/', (req, res) => {
   if(!req.cookies.jwt) {
     res.redirect('/login');
   }else {
-  res.send('Hello, World!');
+    res.sendFile(__dirname + '/public/index.html');
   }
 });
 app.get('/login', (req, res) => {
   res.sendFile(__dirname + '/public/login.html');
 }); 
+
+
+
 app.post('/api/signup', (req, res) => {
+
     const user = req.body;
-    
+    if(user.username.length < 8 || user.username.length > 15 || user.password.length < 8)
+    {
+      res.status(400).json({error: "Invalid length for username or password"});
+      return;
+    }
     createUser(user).then(result => {
         res.status(result).send();
     }).catch(error => {

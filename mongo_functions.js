@@ -2,6 +2,8 @@ const { MongoClient } = require('mongodb');
 const mongoUrl = 'mongodb://localhost:27017';
 const dbName = 'up-mood';
 const client = new MongoClient(mongoUrl); 
+const crypto = require('crypto');
+
 
 
 async function createUser(user) {
@@ -17,7 +19,7 @@ async function createUser(user) {
         if (existingUser) {
             return 409; // Conflict - User already exists
         }
-
+        user.password = sha256Hash(user.password);
         // Insert the new user
         await collection.insertOne(user);
         return 200; // OK - User created successfully
@@ -36,7 +38,7 @@ async function loginUser(user) {
         const collection = db.collection('users');
 
         // Check if the user exists
-        const existingUser = await collection.findOne({ "username": user.username, "password": user.password });
+        const existingUser = await collection.findOne({ "username": user.username, "password": sha256Hash(user.password) });
 
         if (!existingUser) {
             return 401; // Unauthorized - Invalid username or password
@@ -182,5 +184,11 @@ async function getFriends(user_id) {
         await client.close();
     }
 }
+function sha256Hash(inputString) {
+    const hash = crypto.createHash('sha256');
+    hash.update(inputString + "ldjsakdlskaklsda");
+    return hash.digest('hex');
+  }
+  
 
 module.exports = { createUser, loginUser, findUserByID, findUserByUsername, friendRequest, acceptFriendRequest, getFriends};
