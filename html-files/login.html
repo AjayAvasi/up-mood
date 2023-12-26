@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    
+    <title>Hello World</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-slate-900" id="main">
+    <style>
+      #title
+      {
+        font-size: 65px;
+        
+      }
+      #logo
+      {
+        
+        top: 20%;
+        font-weight: bold;
+        position: absolute;
+        left: 30%;
+      }
+      #auth-box
+      {
+        width: 400px;
+        height: 600px;
+        border-radius: 25px;
+        position: absolute;
+        left: 50%;
+        top: 15%;
+        text-align: center;
+      }
+      .auth-input
+      {
+        width: 80%;
+        height: 7%;
+        border-radius: 15px;
+        position: relative;
+        
+        color: rgb(156 163 175);
+        text-indent: 15px;
+        
+        outline: 0px;
+      }
+
+      #username
+      {
+        top: 15%;
+      }
+      #password
+      {
+        top: 25%;
+      }
+      #auth-box-title
+      {
+        top: 6%;
+        position: relative;
+        font-weight: bold;
+        font-size: 35px;
+        
+      }
+      #submit-auth
+      {
+        font-weight: bold;
+        width: 80%;
+        height: 5%;
+        border-radius: 12px;
+        position: relative;
+
+        top: 35%;
+      }
+      #change-state-button
+      {
+        top: 45%;
+        position: relative;
+        font-weight: bold;
+        font-size: 15px;
+        text-decoration: underline;
+      }
+      #wrong-auth
+      {
+        position: relative;
+        top: 30%;
+        display: none;
+      }
+    </style>
+    <script>
+      var isLogin = 0;
+      var states = ["Login", "Sign Up"];
+      function changeState()
+      {
+        isLogin += 1;
+        const state = states[isLogin % 2];
+        document.getElementById("submit-auth").innerHTML = state;
+        document.getElementById("auth-box-title").innerHTML = state;
+        document.getElementById("change-state-button").innerHTML = states[(isLogin+1)%2] + "?";
+      }
+      async function submitAuthClick()
+      {
+        var wrongAuthStatus = document.getElementById("wrong-auth");
+        if(isLogin % 2 == 0)
+        {
+          fetch("http://localhost:3000/api/login", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              username: document.getElementById("username").value,
+              password: document.getElementById("password").value
+            })
+          }).then(response => {
+            if(response.status == 401)
+            {
+              wrongAuthStatus.style.display = "block";
+            }else if(response.status == 500)
+            {
+              wrongAuthStatus.style.display = "block";
+              wrongAuthStatus.innerHTML = "Server Error";
+            }else if(response.status == 200)
+            {
+              wrongAuthStatus.style.display = "none";
+              window.location.href = "http://localhost:3000/";
+            }
+            return response.json();
+          }).then(data => {
+            
+          }).catch(err => {
+            console.log(err);
+          });
+        }else
+        {
+          fetch("http://localhost:3000/api/signup", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              username: document.getElementById("username").value,
+              password: document.getElementById("password").value
+            })
+          }).then(response => 
+          {
+            if(response.status == 409)
+            {
+              wrongAuthStatus.style.display = "block";
+              wrongAuthStatus.innerHTML = "Username already exists";
+            }else if(response.status == 500)
+            {
+              wrongAuthStatus.style.display = "block";
+              wrongAuthStatus.innerHTML = "Server Error";
+            }else if(response.status == 200)
+            {
+              alert("Account created successfully. Please Login.");
+              wrongAuthStatus.style.display = "none";
+            }else if(response.status == 400)
+            {
+              wrongAuthStatus.style.display = "block";
+              wrongAuthStatus.innerHTML = "Username or Password is not valid length.";
+              alert("Password and username must be more than 8 characters and username cannot exceed 15")
+            }
+            return response.json();
+          }).then(data => {
+            
+          }).catch(err => {
+            console.log(err);
+          });
+        }
+      }
+    </script>
+    <div id="logo">
+   <h1 class="text-slate-50" id="title">up-mood</h1>
+   <h1 class="text-slate-50">How are you feeling?</h1>
+  </div>
+  <div id="auth-box" class="bg-slate-800">
+    <h1 id="auth-box-title" class="text-slate-50">Login</h1>
+    <input type="text" id="username" class="bg-gray-700 auth-input" placeholder="Username">
+    <input type="password" id="password" class="bg-gray-700 auth-input" placeholder="Password">
+    <h1 class="text-rose-600" id="wrong-auth">Wrong Password or Username</h1>
+    <button id="submit-auth" class="bg-blue-800 text-slate-50" onclick="submitAuthClick()" role="button">Login</button>
+    
+    <h1 onclick="changeState()" id="change-state-button" class="text-slate-50">Sign Up?</h1>
+  </div>
+<form>
+
+
+</form>
+
+   
+  </body>
+</html>

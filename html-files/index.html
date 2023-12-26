@@ -1,0 +1,359 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    
+    <title>Hello World</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="/socket.io/socket.io.js"></script>
+   </head>
+  <body class="bg-slate-900" id="main">
+    <style>
+        #title
+      {
+        font-size: 65px;
+        
+      }
+      #logo
+      {
+        
+        
+        font-weight: bold;
+        position: absolute;
+        left: 10%;
+      }
+      
+        #mood-selector
+        {
+            
+           
+           position: absolute;
+            width: 500px;
+            height: 500px; 
+            top: 10%; 
+            left: 36%;
+            text-align: center;        
+            
+        }
+        #selected-mood
+        {
+            font-size: 200px;
+        }
+        .emoji-button
+        {
+            border-radius: 50%;
+            width: 70px;
+            height: 70px;
+            margin: 10px;
+        }
+        #emoji-keyboard
+        {
+            position: absolute;
+            top: 80%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 1000px;
+        }
+        #friend-request-UI
+        {
+          text-align: center;
+            position: absolute;
+            align-items: center;
+            top: 80%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 30px;
+            
+        }
+        #search-bar
+        {
+          
+            width: 500px;
+            height: 50px;
+            border-radius: 25px;
+            text-indent: 15px;
+            outline: 0px;
+            margin-bottom: 10px;
+            text-indent: 30px;
+        }
+        .pending-requests
+        {
+          
+          width: 750px;
+          height: 200px;
+          
+          border-radius: 25px;
+          text-align: center;
+          
+        }
+        #username-text
+        {
+          position: relative;
+          top: 30%;
+          transform: translate(0%, -50%);
+          font-size: 50px;
+        }
+        #status
+        {
+          position: relative;
+          top: 30%;
+          transform: translate(0%, -50%);
+          font-size: 30px;
+        }
+        #friend-request-list
+        {
+          position: absolute;
+          transform: translate(-10%, 20%);
+          
+        }
+        #name
+        {
+          position: absolute;
+          left: 75%;
+          top: 5%;
+          font-size: 30px;
+          font-weight: bold;
+        }
+    </style>
+    
+    <div id="logo">
+        <h1 class="text-slate-50" id="title">up-mood</h1>
+        <h1 class="text-slate-50">How are you feeling?</h1>
+    </div>
+    <h1 id="name" class="text-slate-50">Username</h1>
+    <div id="mood-selector">
+        <h1 id="selected-mood">😊</h1>
+        <div id="emoji-keyboard">
+
+        </div>
+    </div>
+    <div id="friend-request-UI">
+        <h1 class="text-slate-50">Send Friend Request</h1>
+        <input type="text" id="search-bar" class="bg-gray-700 text-slate-50">
+        <button class="bg-green-700 text-slate-50" onclick="sendFriendRequest()" style="border-radius: 25px; font-size: 20px; width: 80px; height: 50px; position: relative; bottom: 3px;">Send</button>
+        <div id="friend-request-list">
+            
+        </div>
+    </div>
+    
+    <script>
+      var emojiKeyboard = document.getElementById("emoji-keyboard");
+      var emoji = ["😊","😂","😍","👍","👏","🙌","🔥","❤️","🎉","😎","😢","🤔","👀","😜","🙏","🤣","😅","🤷‍♂️","🤷‍♀️","👌"];
+      for (var i = 0; i < emoji.length; i++)
+      {
+          emojiKeyboard.innerHTML += "<button class='text-slate-50 emoji-button bg-slate-700' style='font-size: 35px;  border: 10px;' onclick='changeMood(" + i + ")'>" + emoji[i] + "</button>";
+      }
+      var addPendingFriendArr = [];
+      var addIncomingFriendArr = [];
+      var addFriendMoodArr = [];
+      
+      fetch("/api/getMyInfo", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }).then((response) => {
+        
+        if (response.status == 200)
+        {
+          response.json().then((data) => {
+            
+            document.getElementById("name").innerHTML = "Hello, " + data.username + "!";
+            document.getElementById("selected-mood").innerHTML = data.mood;
+          });
+          
+        }
+        else if (response.status == 500)
+        {
+          alert("Server Error");
+        }
+      });
+      fetch("/api/getFriendsUsername", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }).then((response) => {
+        
+        if (response.status == 200)
+        {
+          response.json().then((data) => {
+            
+            for (var i = 0; i < data.length; i++)
+            {
+              if(data[i].status == "pending"){
+                if(data[i].from == "target")
+                {
+                  addPendingFriendArr.push(i);
+                  
+                }else if(data[i].from == "origin")
+                {
+                  addIncomingFriendArr.push(i);
+                  
+                }
+             }else if(data[i].status == "accepted")
+             {
+                addFriendMoodArr.push(i);
+                
+
+               
+             }
+            }
+            for (var i = 0; i < addPendingFriendArr.length; i++)
+            {
+              var index = data[addPendingFriendArr[i]];
+              addPendingFriend(index.username);
+            }
+            for (var i = 0; i < addIncomingFriendArr.length; i++)
+            {
+              var index = data[addIncomingFriendArr[i]];
+              addIncomingFriend(index.username);
+            }
+            for (var i = 0; i < addFriendMoodArr.length; i++)
+            {
+              var index = data[addFriendMoodArr[i]];
+              addFriendMood(index.username, index.mood, index.id);
+            }
+          });
+          
+        }
+        else if (response.status == 500)
+        {
+          alert("Server Error");
+        }
+      })
+        
+      const getCookieValue = document.cookie.match('(^|;)\\s*' + "jwt" + '\\s*=\\s*([^;]+)')?.pop() || '';
+      var socket = io.connect(window.location.origin,{query: `jwt=${getCookieValue}`});
+      socket.on("connect", () => {
+        console.log("Server Socket Connected");
+      });
+      socket.on("mood-change", (data) => {
+        
+        var mood = document.getElementById(`${data.id}-mood`);
+        mood.innerHTML = data.mood;
+      });
+          
+        
+      
+      
+      function changeMood(index)
+      {
+          document.getElementById("selected-mood").innerHTML = emoji[index];
+          socket.emit("change-mood", {mood: emoji[index]});
+
+      }
+      function sendFriendRequest()
+      {
+          var searchValue = document.getElementById("search-bar").value;
+          fetch("/api/sendFriendRequest", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              username: searchValue,
+            }),
+          }).then((response) => {
+            if (response.status == 200)
+            {
+              addPendingFriend(searchValue);
+            }else if (response.status == 404)
+            {
+              alert("User not found");
+            }
+            else if (response.status == 409)
+            {
+              alert("You are already friends or sent a request with this user");
+            }
+            else if (response.status == 500)
+            {
+              alert("Server Error");
+            }
+          });
+      }
+      function acceptFriendRequest(username)
+      {
+        fetch("/api/acceptFriendRequest", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            username: username,
+          }),
+        }).then((response) => {
+          if (response.status == 200)
+          {
+            alert("Friend Request Accepted");
+            window.location.href = "http://localhost:3000/";
+          }else if (response.status == 404)
+          {
+            alert("User not found");
+          }
+          else if (response.status == 409)
+          {
+            alert("You are already friends or sent a request with this user");
+          }
+          else if (response.status == 500)
+          {
+            alert("Server Error");
+          }
+        });
+      }
+      function rejectFriendRequest(username)
+      {
+        fetch("/api/rejectFriendRequest", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            username: username,
+          }),
+        }).then((response) => {
+          if (response.status == 200)
+          {
+            alert("Friend Request Rejected");
+            window.location.href = "http://localhost:3000/";
+          }else if (response.status == 404)
+          {
+            alert("User not found");
+          }
+          else if (response.status == 409)
+          {
+            alert("You are already friends or sent a request with this user");
+          }
+          else if (response.status == 500)
+          {
+            alert("Server Error");
+          }
+        });
+      }
+      function addPendingFriend(username)
+      {
+        var friendRequestList = document.getElementById("friend-request-list");
+        friendRequestList.innerHTML += `<div class="pending-requests bg-slate-800"><h1 class="text-slate-50" id="username-text">${username}</h1><h2 class="text-yellow-300" id="status">Pending...</h2></div>`;
+      }
+      function addIncomingFriend(username)
+      {
+        var friendRequestList = document.getElementById("friend-request-list");
+        friendRequestList.innerHTML += `<div class="pending-requests bg-slate-800">
+          <h1 class="text-slate-50" id="username-text">${username}</h1>
+          <button class="bg-green-700 text-slate-50" onclick="acceptFriendRequest('${username}')" style="border-radius: 25px; font-size: 20px; width: 80px; height: 50px; position: relative; bottom: 3px; top: 30px">Accept</button>
+          <button class="bg-rose-700 text-slate-50" onclick="rejectFriendRequest('${username}')" style="border-radius: 25px; font-size: 20px; width: 80px; height: 50px; position: relative; bottom: 3px; top: 30px">Reject</button>
+          </div>`;
+      }
+      function addFriendMood(username, mood, id)
+      {
+        var friendRequestList = document.getElementById("friend-request-list");
+        friendRequestList.innerHTML += `<div class="pending-requests bg-slate-800"><h1 class="text-slate-50" >${username}</h1><h2 class="text-yellow-300" id="${id}-mood">${mood}</h2></div>`;
+      }
+
+      
+      
+      
+      
+  </script>
+</body>
+</html>
