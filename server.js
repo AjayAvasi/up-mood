@@ -21,6 +21,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(express.static(__dirname + '/public'));
 
+
 app.get("/login", (req, res) =>{
 
     res.sendFile(__dirname + "/html-files/login.html");
