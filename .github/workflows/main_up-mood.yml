@@ -52,5 +52,5 @@ jobs:
         with:
           app-name: 'up-mood'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_467D938972B647CBB539882784E6330C }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_3DF4BE57858C433CA9DCBDD8E6CF243D }}
           package: .
