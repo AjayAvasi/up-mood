@@ -1,7 +1,7 @@
 const { MongoClient } = require('mongodb');
 const { ReadPreference } = require('mongodb');
 
-const mongoUrl = 'mongodb://localhost:27017';
+const mongoUrl = process.env.MONGO_URL;
 const dbName = 'up-mood';
 var connections = [];
 

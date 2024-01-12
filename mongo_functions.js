@@ -2,7 +2,7 @@ const { MongoClient } = require('mongodb');
 const { ReadPreference } = require('mongodb');
 const {createConnection, init_conections, is_pool_full, get_connection, return_connection} = require("./mongo_pool_manager.js")
 
-const mongoUrl = 'mongodb://localhost:27017';
+const mongoUrl = process.env.MONGO_URL;
 const dbName = 'up-mood';
 
 
@@ -336,8 +336,9 @@ async function areFriends(user_id, friend_id) {
 }
 
 function sha256Hash(inputString) {
+    const changeKey = process.env.CHANGE_KEY;
     const hash = crypto.createHash('sha256');
-    hash.update(inputString + "ldjsakdlskaklsda");
+    hash.update(inputString + changeKey);
     return hash.digest('hex');
 }
 

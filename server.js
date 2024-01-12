@@ -11,10 +11,9 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIO(server);
 
-const port = 3000;
+const port = process.env.WEB_PORT;
 
-secretKey = "akjfhasdkjlfhkjsdf";
-
+const secretKey = process.env.JWT_SIGN;
 
 
 app.use(express.json());
@@ -292,7 +291,7 @@ io.on('connection', (socket) => {
 
 
 server.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
+  console.log(`Server is running on PORT:${port}`);
 });
 
 function verifyToken(req, res) {
