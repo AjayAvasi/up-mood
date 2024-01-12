@@ -7,7 +7,7 @@ const dbName = 'up-mood';
 
 
 const crypto = require('crypto');
-init_conections(10);
+init_conections(process.env.MONGO_POOL_SIZE);
 
 async function createUser(user) {
     const client = get_connection();
