@@ -100,7 +100,7 @@
         var wrongAuthStatus = document.getElementById("wrong-auth");
         if(isLogin % 2 == 0)
         {
-          fetch("http://localhost:3000/api/login", {
+          fetch("/api/login", {
             method: "POST",
             headers: {
               "Content-Type": "application/json"
@@ -120,7 +120,7 @@
             }else if(response.status == 200)
             {
               wrongAuthStatus.style.display = "none";
-              window.location.href = "http://localhost:3000/";
+              window.location.href = "/";
             }
             return response.json();
           }).then(data => {
@@ -130,7 +130,7 @@
           });
         }else
         {
-          fetch("http://localhost:3000/api/signup", {
+          fetch("/api/signup", {
             method: "POST",
             headers: {
               "Content-Type": "application/json"

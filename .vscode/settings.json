@@ -1,0 +1,4 @@
+{
+    "appService.defaultWebAppToDeploy": "/subscriptions/cf535033-f6f5-46b2-9bd2-f9658330ab4f/resourceGroups/upmood_group/providers/Microsoft.Web/sites/upmood",
+    "appService.deploySubpath": "."
+}
