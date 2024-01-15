@@ -231,7 +231,10 @@
             {
               wrongAuthStatus.style.display = "block";
               wrongAuthStatus.innerHTML = "Username or Password is not valid length.";
-              alert("Password and username must be more than 8 characters and username cannot exceed 15")
+              if(document.getElementById("username").value.length <= 0)
+                alert("Username must have at least 1 character.");
+              else
+                alert("Password must have between 8-20 characters and must include symbols, numbers, and letters.")
             }
             return response.json();
           }).then(data => {

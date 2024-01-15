@@ -41,7 +41,7 @@ app.post('/api/signup', (req, res) => {
         return;
     }
     const user = req.body;
-    if(user.username.length < 8 || user.username.length > 15 || user.password.length < 8)
+    if(user.username.length <= 0 || !(/[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/.test(user.password) && /\d/.test(user.password) && /[a-zA-Z]/g.test(user.password) && user.password.length >= 8 && user.password.length <= 20))
     {
       res.status(400).json({error: "Invalid length for username or password"});
       return;

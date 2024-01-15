@@ -264,7 +264,7 @@
         {
           response.json().then((data) => {
             
-            document.getElementById("name").innerHTML = "Hello, " + data.username + "!";
+            document.getElementById("name").innerHTML = "Hello, " + (data.username || "User") + "!";
             document.getElementById("selected-mood").innerHTML = data.mood;
           });
           
