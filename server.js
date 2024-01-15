@@ -11,7 +11,7 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIO(server);
 
-const port = process.env.PORT;
+const port = process.env.PORT || 3000;
 
 const secretKey = process.env.JWT_SIGN;
 
