@@ -169,12 +169,9 @@
         document.getElementById("auth-box-title").innerHTML = state;
         document.getElementById("change-state-button").innerHTML = states[(isLogin+1)%2] + "?";
       }
-      async function submitAuthClick()
+      function loginFunc(wrongAuthStatus)
       {
-        var wrongAuthStatus = document.getElementById("wrong-auth");
-        if(isLogin % 2 == 0)
-        {
-          fetch("/api/login", {
+        fetch("/api/login", {
             method: "POST",
             headers: {
               "Content-Type": "application/json"
@@ -202,6 +199,13 @@
           }).catch(err => {
             console.log(err);
           });
+      }
+      async function submitAuthClick()
+      {
+        var wrongAuthStatus = document.getElementById("wrong-auth");
+        if(isLogin % 2 == 0)
+        {
+          loginFunc(wrongAuthStatus);
         }else
         {
           fetch("/api/signup", {
@@ -225,8 +229,11 @@
               wrongAuthStatus.innerHTML = "Server Error";
             }else if(response.status == 200)
             {
-              alert("Account created successfully. Please Login.");
+              alert("Account Created!");
+              loginFunc(wrongAuthStatus);
               wrongAuthStatus.style.display = "none";
+              window.location.href = "/";
+
             }else if(response.status == 400)
             {
               wrongAuthStatus.style.display = "block";

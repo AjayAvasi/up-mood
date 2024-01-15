@@ -218,6 +218,29 @@
             transform: translate(-10%, 20%);
             left: -2% !important;
           }
+          #username-text
+          {
+            position: relative;
+            top: 30%;
+            transform: translate(0%, -50%);
+            font-size: 20px;
+          }
+          #status
+          {
+            position: relative;
+            top: 30%;
+            transform: translate(0%, -50%);
+            font-size: 17px;
+          }
+          .incoming-button
+          {
+            font-size: 15px !important;
+            width: 50px !important;
+            height: 30px !important;
+            position: relative;
+            bottom: 3px;
+            top: 30px;
+          }
         }
     </style>
     
@@ -446,8 +469,8 @@
         var friendRequestList = document.getElementById("friend-request-list");
         friendRequestList.innerHTML += `<div class="pending-requests bg-slate-800">
           <h1 class="text-slate-50" id="username-text">${username}</h1>
-          <button class="bg-green-700 text-slate-50" onclick="acceptFriendRequest('${username}')" style="border-radius: 25px; font-size: 20px; width: 80px; height: 50px; position: relative; bottom: 3px; top: 30px">Accept</button>
-          <button class="bg-rose-700 text-slate-50" onclick="rejectFriendRequest('${username}')" style="border-radius: 25px; font-size: 20px; width: 80px; height: 50px; position: relative; bottom: 3px; top: 30px">Reject</button>
+          <button class="bg-green-700 text-slate-50 incoming-button" onclick="acceptFriendRequest('${username}')" style="border-radius: 25px; font-size: 20px; width: 80px; height: 50px; position: relative; bottom: 3px; top: 30px">Accept</button>
+          <button class="bg-rose-700 text-slate-50 incoming-button" onclick="rejectFriendRequest('${username}')" style="border-radius: 25px; font-size: 20px; width: 80px; height: 50px; position: relative; bottom: 3px; top: 30px">Reject</button>
           </div>`;
       }
       function addFriendMood(username, mood, id)
